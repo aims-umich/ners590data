@@ -1,0 +1,16 @@
+#get paths to all images
+img_names=os.listdir(predict_path)
+for fn in img_names:
+  # predict images
+  path = predict_path + fn
+  img = image.load_img(path, target_size=(300,300))
+  x = image.img_to_array(img)
+  x = np.expand_dims(x, axis =0)
+  images = np.vstack([x])
+  classes = MODEL.predict(images, batch_size = 1)
+  if classes[0]> 0.5:
+    print(fn + ' is pneumonia')
+    plt.imshow(img)
+  else:
+    print(fn + 'is normal')
+    plt.imshow(img)
