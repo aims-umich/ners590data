@@ -1,0 +1,31 @@
+def plot_clusters(X, labels, title='Method'):
+    cdict = {0: 'red', 1: 'blue', 2: 'green'}
+    x_scatter=np.array(range(len(X)))
+    y_scatter=np.mean(X,axis=1)
+    group=labels
+    fig, ax = plt.subplots()
+    for g in np.unique(group):
+        ix = np.where(group == g)[0]
+        ax.scatter(x_scatter[ix], y_scatter[ix], c = cdict[g], label = g, s = 5)
+    plt.xlabel('Sample Number')
+    plt.ylabel('Mean Count')
+    plt.title(title)
+    plt.show()
+
+def accuracy(labels):
+    n=len(np.unique(labels))
+    if n==2:
+        c1=Counter(labels[0:2000])
+        c2=Counter(labels[2000:4000])
+        print('Class 0 Accuracy:', c1[0]/(c1[0]+c1[1]))
+        print('Class 1 Accuracy:', c2[1]/(c2[0]+c2[1]))
+    if n==3:
+        c1=Counter(labels[0:1000])
+        print(c1)
+        c2=Counter(labels[1000:2000])
+        print(c2)
+        c3=Counter(labels[2000:4000])
+        print(c3)
+        print('Class 0 Accuracy:', c1[0]/(c1[0]+c1[1] + c1[2]))
+        print('Class 1 Accuracy:', c2[1]/(c2[0]+c2[1] + c2[2]))        
+        print('Class 2 Accuracy:', c3[2]/(c3[0]+c3[1] + c3[2])) 
