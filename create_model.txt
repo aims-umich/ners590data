@@ -1,0 +1,57 @@
+#-----------------------
+# Data preprocessing
+#-----------------------
+
+#load the x,y data and convert to numpy array
+xurl='https://raw.githubusercontent.com/MajdiRadaideh/S097data/main/cr_x.csv'
+yurl='https://raw.githubusercontent.com/MajdiRadaideh/S097data/main/power_y.csv'
+xdata=pd.read_csv(xurl).values
+ydata=pd.read_csv(yurl).values
+
+# split into training/testing sets
+xtrain=xdata[0:900,:]
+ytrain=ydata[0:900,:]
+xtest=xdata[900:,:]
+ytest=ydata[900:,:]
+
+#create min-max scaled data
+xscaler = preprocessing.MinMaxScaler()
+yscaler = preprocessing.MinMaxScaler()
+Xtrain=xscaler.fit_transform(xtrain)
+Xtest=xscaler.transform(xtest)
+Ytrain=yscaler.fit_transform(ytrain)
+Ytest=yscaler.transform(ytest)
+
+#-----------------------
+# Target fitness function
+#-----------------------
+
+@use_named_args(dimensions=dimensions)
+def fitness(learning_rate, num_layers, num_nodes):
+
+    # Create the deep learning model.
+    model = Sequential()
+    model.add(Dense(50, kernel_initializer='normal',input_dim = Xtrain.shape[1], activation='relu'))
+    
+    for i in range(1,num_layers):
+        model.add(Dense(num_nodes, kernel_initializer='normal',activation='relu'))
+        if i==1:
+            model.add(Dropout(0.5))
+        
+    model.add(Dense(Ytrain.shape[1], kernel_initializer='normal',activation='linear'))
+    
+    model.compile(loss='mean_absolute_error', optimizer=Adam(lr=learning_rate), metrics=['mean_absolute_error'])
+    #model.summary()
+    
+    # train the model
+    model.fit(Xtrain, Ytrain, epochs=50, batch_size=8, validation_split = 0.15, verbose=False)
+
+    # Get the R2 score on the test-set
+    Ynn=model.predict(Xtest)
+    R2=r2_score(Ytest,Ynn)
+    
+    #print the results
+    print('learning_rate=', np.round(learning_rate,6), 'num_layers=', num_layers, 'num_nodes=', num_nodes, 'R2=', np.round(R2,3))
+    
+    #If you are maximizing the metric, return nagative value since gp_minimize is built to minimize the metric
+    return -R2
