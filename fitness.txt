@@ -3,8 +3,8 @@
 #-----------------------
 
 #load the x,y data and convert to numpy array
-xurl='https://raw.githubusercontent.com/MajdiRadaideh/S097data/main/cr_x.csv'
-yurl='https://raw.githubusercontent.com/MajdiRadaideh/S097data/main/power_y.csv'
+xurl='https://raw.githubusercontent.com/MajdiRadaideh/S097data/main/crx.csv'
+yurl='https://raw.githubusercontent.com/MajdiRadaideh/S097data/main/powery.csv'
 xdata=pd.read_csv(xurl).values
 ydata=pd.read_csv(yurl).values
 
@@ -15,8 +15,8 @@ xtest=xdata[900:,:]
 ytest=ydata[900:,:]
 
 #create min-max scaled data
-xscaler = preprocessing.MinMaxScaler()
-yscaler = preprocessing.MinMaxScaler()
+xscaler = MinMaxScaler()
+yscaler = MinMaxScaler()
 Xtrain=xscaler.fit_transform(xtrain)
 Xtest=xscaler.transform(xtest)
 Ytrain=yscaler.fit_transform(ytrain)
