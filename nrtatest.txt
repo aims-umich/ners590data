@@ -1,0 +1,41 @@
+def test_model(n):
+    """
+    n: number of samples (time series curves to check randomly in the internal test set)
+    """
+    print("{} || {}".format("True", "Predicted"))
+    print(60 * "=")
+    for i in range(n):
+        i = np.random.randint(0,Xtest.shape[0]) # choose a random number between 0 and len(X_te)
+        p = model.predict_classes(np.array([Xtest[i]]))[0]
+        true = np.argmax(Ytest[i], -1)
+        print("{} || {} (Test sample number {} of {})".format(elements[true], elements[p], i, Xtest.shape[0]))
+
+    print(60 * "=")
+
+
+def make_plots(X, Y, first_bin=0):
+    """
+    X: input data
+    Y: labels
+    first_bin: the first time step to include in plotting 
+              (for scaling if the transmission values of the first few bins are very uncertain)
+    """
+    print("{} || {}".format("True", "Predicted"))
+    print(60 * "=")
+    for i in range(X.shape[0]):
+        plt.figure()
+        #i = np.random.randint(0,X.shape[0]) # choose a random number between 0 and len(X_te)
+        p = model.predict_classes(np.array([X[i]]))[0]
+        true = np.argmax(Y[i], -1)
+        print("{} || {} (External Test sample number {} of {})".format(elements[true], elements[p], i+1, X.shape[0]))
+        plt.title("{} (True) || {} (Predicted) (Sample number {} of {})".format(elements[true], elements[p], i+1, X.shape[0]))
+        if (p==true):
+            plt.plot(t[first_bin:],X[i,first_bin:], c=colors[p])
+            plt.legend(['CORRECT Prediction ({})'.format(elements[p])])
+        
+        else:
+            plt.plot(t[first_bin:],X[i,first_bin:], c='k')
+            plt.legend(['WRONG Prediction'])
+        plt.show()
+    
+    print(60 * "=")
