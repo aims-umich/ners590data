@@ -1,0 +1,12 @@
+def read_data (csvname):
+    data = pd.read_csv(csvname, encoding="latin1")
+    data = data.fillna(method="ffill")
+    print("Number of sentences: ", len(data.groupby(['Sentence #'])))
+    words = list(data["Word"].values)
+    tags = list(set(data["Tag"].values))
+    print("Tags:", tags)
+    print("What the dataset looks like:")
+    # Show the first 10 rows
+    data.head(n=10)
+    
+    return data, words, tags

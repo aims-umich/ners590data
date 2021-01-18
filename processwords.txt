@@ -1,0 +1,46 @@
+#---------------------------
+# Word Data Preprocessing
+#---------------------------
+def process_words (words, tags, sentences):
+    # Vocabulary Key:word -> Value:token_index
+    # The first 2 entries are reserved for PAD and UNK
+    word2idx = {w: i + 2 for i, w in enumerate(words)}
+    word2idx["UNK"] = 1 # Unknown words
+    word2idx["PAD"] = 0 # Padding
+    
+    # Vocabulary Key:token_index -> Value:word
+    idx2word = {i: w for w, i in word2idx.items()}
+    
+    # Vocabulary Key:Label/Tag -> Value:tag_index
+    # The first entry is reserved for PAD
+    tag2idx = {t: i+1 for i, t in enumerate(tags)}
+    tag2idx["PAD"] = 0
+    
+    # Vocabulary Key:tag_index -> Value:Label/Tag
+    idx2tag = {i: w for w, i in tag2idx.items()}
+    
+    print("The word diversity is identified by the index: {}".format(word2idx["diversity"]))
+    print("The labels DEI(which defines diversity words) is identified by the index: {}".format(tag2idx["DEI"]))
+    
+    
+    from keras.preprocessing.sequence import pad_sequences
+    # Convert each sentence from list of Token to list of word_index
+    X = [[word2idx[w[0]] for w in s] for s in sentences]
+    # Padding each sentence to have the same lenght
+    X = pad_sequences(maxlen=MAX_LENGH, sequences=X, padding="post", value=word2idx["PAD"])
+    
+    # Convert Tag/Label to tag_index
+    y = [[tag2idx[w[1]] for w in s] for s in sentences]
+    # Padding each sentence to have the same lenght
+    y = pad_sequences(maxlen=MAX_LENGH, sequences=y, padding="post", value=tag2idx["PAD"])
+    
+    from keras.utils import to_categorical
+    # One-Hot encode
+    y = [to_categorical(i, num_classes=n_tags+1) for i in y]  # n_tags+1(PAD)
+    
+    print('Raw Sample: ', ' '.join([w[0] for w in sentences[0]]))
+    print('Raw Label: ', ' '.join([w[1] for w in sentences[0]]))
+    print('After processing, sample:', X[0])
+    print('After processing, labels:', y[0])
+    
+    return X, y, idx2tag, idx2word
