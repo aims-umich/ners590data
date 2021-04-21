@@ -1,0 +1,69 @@
+def callback(_locals, _globals):
+    """
+    Callback called at each step (for DQN and others)
+    This callback is used to access the algorathim on the fly to plot statistics and save models
+    :param _locals: (dict)
+    :param _globals: (dict)
+    """
+    global n_steps, best_mean_reward
+    
+    # Print stats every check_freq calls
+    try:
+        if (n_steps + 1) % (check_freq) == 0:
+            # Evaluate policy training performance
+            data=pd.read_csv(log_dir + env_data["casename"] + '_out.csv')
+            print('***************************************************************************')
+            print('--Plotting progress {}/{}'.format(n_steps,time_steps))
+            print('***************************************************************************')
+            mean_reward = np.mean(data["reward"].iloc[-avg_step:])
+            
+            #--------------
+            #model saving
+            #-------------
+            if mean_reward > best_mean_reward and save_flag:
+                best_mean_reward = mean_reward
+                print("Saving new best model")
+                _locals['self'].save(log_dir + env_data["casename"]+'_best_model.pkl')
+            
+            #------------------
+            #Progress Plot
+            #------------------
+            color_list=['b', 'g', 'r', 'darkorange', 'm', 'c', 'purple', 'tab:brown', 'lime', 'y']
+            plot_data=data.drop(['caseid'], axis=1)  #exclude caseid, which is the first column from plotting (meaningless)
+            ny=plot_data.shape[1] 
+    
+            xx= [(2,2,1), (2,2,2), (2,2,3), (2,2,4)]
+            plt.figure(figsize=(12, 8))
+            color_index=0
+            for i in range (ny): #exclude caseid from plot, which is the first column 
+                plt.subplot(xx[i][0], xx[i][1], xx[i][2])
+                ravg, rstd, rmax, rmin=calc_cumavg(list(plot_data.iloc[:,i]),avg_step)
+                epochs=np.array(range(1,len(ravg)+1),dtype=int)
+                
+                plt.plot(epochs,ravg, '-o', c=color_list[color_index], label=r'$V_{k}$'.format(k=i))
+                
+                plt.fill_between(epochs,[a_i - b_i for a_i, b_i in zip(ravg, rstd)], [a_i + b_i for a_i, b_i in zip(ravg, rstd)],
+                alpha=0.2, edgecolor=color_list[color_index], facecolor=color_list[color_index])
+                color_index+=1
+                plt.plot(epochs,rmax,'s', c='k', markersize=3)
+                plt.plot(epochs,rmin,'+', c='k', markersize=6)
+                
+                plt.axhline(y=desired[i], color='k', linestyle='--', label='Desired Value') 
+                plt.xlabel('Epoch', fontsize=12)
+                plt.ylabel(plot_data.columns[i], fontsize=12)
+            
+            legend_elements = [Line2D([0], [0], color='k', marker='o', label='Mean ' + r'$\pm$ ' +r'$1\sigma$' + ' per epoch (color changes)'),
+                  Line2D([0], [0], color='k', marker='s', label='Max per epoch'),
+                  Line2D([0], [0], linestyle='-.', color='k', marker='+', label='Min per epoch'),
+                  Line2D([0], [0], linestyle='--', color='k', label='Desired Value')]
+            plt.figlegend(handles=legend_elements, loc='upper center', bbox_to_anchor=(0.5, 1.02), ncol=4)
+            plt.tight_layout()
+            plt.savefig(log_dir+env_data["casename"] + '_plt.png', format='png', dpi=200, bbox_inches="tight")
+            plt.close()
+        #------------------
+        
+    except:
+        print('--warning: trying to plot an empty or small logger, try to increase check_freq to allow logging enough data')
+    
+    n_steps += 1
+    return True
