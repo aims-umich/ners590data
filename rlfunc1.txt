@@ -1,0 +1,30 @@
+class DQNCallBack(BaseCallback):
+    """
+    Callback for logging data of DQN
+    :param check_freq: (int) how frequent to activate the logger
+    """
+    def __init__(self, check_freq=1, verbose=False):
+        super(RLLogger, self).__init__(verbose)
+        self.check_freq = check_freq
+        self.verbose=verbose
+        self._init_callback()
+
+    def _init_callback(self) -> None:
+        # Create folder if needed
+        pass
+
+    def _on_training_start(self) -> None:
+        """
+        This method is called before the first rollout starts.
+        """
+        pass
+
+    def _on_step(self) -> bool:
+        
+        if self.n_calls % self.check_freq == 0:
+            try:
+                self.r_hist=self.locals['episode_rewards']
+            except:
+                print('--warning: episode rewards are not registered by the RLlogger callback')
+                pass
+        return True
