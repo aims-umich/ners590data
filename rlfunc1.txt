@@ -4,7 +4,7 @@ class DQNCallBack(BaseCallback):
     :param check_freq: (int) how frequent to activate the logger
     """
     def __init__(self, check_freq=1, verbose=False):
-        super(RLLogger, self).__init__(verbose)
+        super(DQNCallBack, self).__init__(verbose)
         self.check_freq = check_freq
         self.verbose=verbose
         self._init_callback()
