@@ -1,0 +1,34 @@
+def split_sequence(x_features, y_sequence, lookback):
+
+    tx, ty = list(), list()
+    for i in range(len(y_sequence)):
+        # find the end of this pattern
+        end_ix = i + lookback
+        # check if we are beyond the sequence
+        if end_ix > len(y_sequence)-1:
+            break
+        # gather input and output parts of the pattern
+        seq_x, seq_y = y_sequence[i:end_ix,:,:], y_sequence[end_ix,:,:]
+        
+        tx.append(seq_x)
+        ty.append(seq_y)
+    
+    tx=np.array(tx)
+    ty=np.array(ty)
+    # Append the splitted sequence to the features array    
+    n_times=ty.shape[0]
+    n_samples=ty.shape[1]
+    n_features=x_features.shape[1]
+    ny=y_sequence.shape[2]
+    
+    # Form a full 3D array for the splitted data as follows:
+    # Rows: number of random samples 
+    # Columns: Number of Feautres + Number of lookback steps * n_outputs
+    # Height: Number of TimeSteps in the Time series
+    X=np.zeros((n_samples,n_features+lookback*ny,n_times))
+    for i in range (n_times):
+        
+        xmod=np.c_[tx[i,:,:,0].T,x_features]
+        X[:,:,i]=xmod
+        
+    return np.array(X), np.array(ty)

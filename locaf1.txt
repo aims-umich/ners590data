@@ -1,0 +1,17 @@
+def import_timeseries(urlx, urly):
+    X=pd.read_csv(urlx,index_col=False).values
+    Yraw=pd.read_csv(urly,index_col=False).values
+    Yraw=Yraw[70:870, :]
+    # delete a bad index
+    X=np.delete(X,[1313], axis=0)
+    Yraw=np.delete(Yraw,[1313], axis=1)
+    
+    # Reduce Time steps by half
+    nt,ns=Yraw.shape
+    Y=np.zeros((int(nt/2),ns))
+    index=0
+    for i in range(0,nt,2):
+        Y[index,:]=Yraw[i,:]
+        index=index+1
+        
+    return X,Y
