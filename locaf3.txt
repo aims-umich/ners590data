@@ -1,4 +1,4 @@
-def DataSplitter(X,Y,Ntr,Nt,Nv):
+def DataSplitter(X,Y,Ntr,Nnom,Ntest):
 
     # Y scaling (use it only with LSTM)
     Yscaled=np.empty_like(Y) 
@@ -15,31 +15,31 @@ def DataSplitter(X,Y,Ntr,Nt,Nv):
      
     n_samples=X.shape[0]
     # skip the first sample for nominal
-    index_valid = list(range(1,Nv+1))
-    perm=list(range(Nv+1,n_samples))
+    index_valid = list(range(1,Ntest+1))
+    perm=list(range(Ntest+1,n_samples))
     index_training = np.sort(random.sample(perm,Ntr))
         
     Xtr=X[index_training,:]
-    Xv=X[index_valid,:]
+    Xtest=X[index_valid,:]
     Ytr=Y[:,index_training,:]
-    Yv=Y[:,index_valid,:]
+    Ytest=Y[:,index_valid,:]
     
     #Test (Nominal TRACE Run)
     test_index=[0,0]
-    Xt=X[test_index,:,:]
-    Yt=Y[:,test_index,:]
+    Xnom=X[test_index,:,:]
+    Ynom=Y[:,test_index,:]
     
     # Transpose data for fitting in LSTM 
-    Ytr=Ytr.transpose(1,0,2); Yt=Yt.transpose(1,0,2); Yv=Yv.transpose(1,0,2)
-    Xtr=Xtr.transpose(0,2,1); Xt=Xt.transpose(0,2,1); Xv=Xv.transpose(0,2,1)
+    Ytr=Ytr.transpose(1,0,2); Ynom=Ynom.transpose(1,0,2); Ytest=Ytest.transpose(1,0,2)
+    Xtr=Xtr.transpose(0,2,1); Xnom=Xnom.transpose(0,2,1); Xtest=Xtest.transpose(0,2,1)
     
     # check if the nominal test case in the training or validation set
     for i in range (Xtr.shape[0]):
-        if (np.array_equal(Xt[0,:,:],Xtr[i,:,:])):
+        if (np.array_equal(Xnom[0,:,:],Xtr[i,:,:])):
             raise Exception ('The nominal test case exists in the training set')
-    for i in range (Xv.shape[0]):
-        if (np.array_equal(Xt[0,:,:],Xv[i,:,:])):
+    for i in range (Xtest.shape[0]):
+        if (np.array_equal(Xnom[0,:,:],Xtest[i,:,:])):
             raise Exception ('The nominal test case exists in the validation set')
     
     
-    return (Xtr, Ytr), (Xt, Yt), (Xv,Yv), (Ymax, Ymin)
+    return (Xtr, Ytr), (Xnom, Ynom), (Xtest,Ytest), (Ymax, Ymin)
