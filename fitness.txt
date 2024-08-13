@@ -3,16 +3,13 @@
 #-----------------------
 
 #load the x,y data and convert to numpy array
-xurl='https://raw.githubusercontent.com/MajdiRadaideh/S097data/main/crx.csv'
-yurl='https://raw.githubusercontent.com/MajdiRadaideh/S097data/main/powery.csv'
+xurl='https://raw.githubusercontent.com/aims-umich/ners590data/main/crx.csv'
+yurl='https://raw.githubusercontent.com/aims-umich/ners590data/main/powery.csv'
 xdata=pd.read_csv(xurl).values
 ydata=pd.read_csv(yurl).values
 
 # split into training/testing sets
-xtrain=xdata[0:900,:]
-ytrain=ydata[0:900,:]
-xtest=xdata[900:,:]
-ytest=ydata[900:,:]
+xtrain, xtest, ytrain, ytest=train_test_split(xdata, ydata, test_size=0.2, random_state=42)
 
 #create min-max scaled data
 xscaler = MinMaxScaler()
