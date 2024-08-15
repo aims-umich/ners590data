@@ -1,3 +1,6 @@
+#-----------------------------------------
+#Quick Model Testing
+#-----------------------------------------
 def test_model(n):
     """
     n: number of samples (time series curves to check randomly in the internal test set)
@@ -6,13 +9,15 @@ def test_model(n):
     print(60 * "=")
     for i in range(n):
         i = np.random.randint(0,Xtest.shape[0]) # choose a random number between 0 and len(X_te)
-        p = model.predict_classes(np.array([Xtest[i]]))[0]
+        p = np.argmax(model.predict(np.array([Xtest[i]]))[0]) #get the predictions as categorial variables of highest probability
         true = np.argmax(Ytest[i], -1)
         print("{} || {} (Test sample number {} of {})".format(elements[true], elements[p], i, Xtest.shape[0]))
 
     print(60 * "=")
 
-
+#-----------------------------------------
+#Model Deployment (Additional Testing)
+#-------------------------------------------
 def make_plots(X, Y, first_bin=0):
     """
     X: input data
@@ -25,7 +30,7 @@ def make_plots(X, Y, first_bin=0):
     for i in range(X.shape[0]):
         plt.figure()
         #i = np.random.randint(0,X.shape[0]) # choose a random number between 0 and len(X_te)
-        p = model.predict_classes(np.array([X[i]]))[0]
+        p = np.argmax(model.predict(np.array([Xtest[i]]))[0]) #get the predictions as categorial variables of highest probability
         true = np.argmax(Y[i], -1)
         print("{} || {} (External Test sample number {} of {})".format(elements[true], elements[p], i+1, X.shape[0]))
         plt.title("{} (True) || {} (Predicted) (Sample number {} of {})".format(elements[true], elements[p], i+1, X.shape[0]))
